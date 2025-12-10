@@ -23,6 +23,18 @@
   - **篩選邏輯**：編寫函數篩選出 10 個特定的場地（Venues），確保每個場地至少有 3 個事件。
   - **數據清洗**：僅保留英文（English only），提取 `Title`, `Venue`, `Date/Time`, `Description`, `Presenter`。
   - **地理編碼**：為這 10 個場地手動或自動查找經緯度（Latitude/Longitude），這是地圖功能的核心。
+  - **測試**
+    1. 確保 MongoDB 已啟動
+      （  啟動MongoDB： brew services start mongodb-community@8.0
+          停止MongoDB： brew services stop mongodb-community@8.0）
+    2. 在 backend 目錄下執行  npm install axios xml2js mongoose dotenv 
+    3. 執行  node utils/importData.js 
+    4. 如果成功，終端機會顯示  🎉 Successfully imported ... events
+  （Programme information： https://www.lcsd.gov.hk/datagovhk/event/events.xml
+  Venues of programmes： https://www.lcsd.gov.hk/datagovhk/event/venues.xml
+  Closed dates of venues： https://www.lcsd.gov.hk/datagovhk/event/holiday.xml
+  Dates of programmes：https://www.lcsd.gov.hk/datagovhk/event/eventDates.xml）
+
 
 #### 3. 數據庫設計 (MongoDB Schema)
 在 `/backend/models` 中定義 Mongoose Schemas：
