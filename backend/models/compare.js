@@ -1,11 +1,27 @@
 import mongoose from 'mongoose';
 
 const LocationSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true }, // XML 中的 Venue ID
-  name: { type: String, required: true },
-  latitude: { type: Number, required: true },
-  longitude: { type: Number, required: true },
-  events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }] // 關聯 Event
+  id: {
+    type: String,
+    required: true,
+    unique: true
+  }, // XML 中的原始 Venue ID
+  name: { 
+    type: String, 
+    required: true 
+  },
+  latitude: { // 保持扁平化結構以兼容 importData.js，或者您也可以改用 coords 對象
+    type: Number, 
+    required: true 
+  },
+  longitude: { 
+    type: Number, 
+    required: true 
+  },
+  events: [{ 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Event' 
+  }]
 });
 
 // 添加虛擬屬性 coords 以方便前端使用 {lat, lng} 格式
