@@ -34,15 +34,15 @@
   Venues of programmes： https://www.lcsd.gov.hk/datagovhk/event/venues.xml
   Closed dates of venues： https://www.lcsd.gov.hk/datagovhk/event/holiday.xml
   Dates of programmes：https://www.lcsd.gov.hk/datagovhk/event/eventDates.xml）
-
+  （測試： brew services start mongodb-community@8.0  ->   node utils/importData.js）
+   (MongoDB Compass:  mongodb://127.0.0.1:27017 -Location -Event)
 
 #### 3. 數據庫設計 (MongoDB Schema)
 在 `/backend/models` 中定義 Mongoose Schemas：
 - **User Schema**: `username`, `password` (記得 hash 加密), `role` ('admin' | 'user'), `favorites` (Array of Location IDs).
 - **Location Schema**: `name`, `coords` {lat, lng}, `events` (Reference or Embedded).
 - **Event Schema**: `title`, `description`, `date`, `venue` (Reference to Location), `presenter`.
-- **Comment Schema**: `user` (Reference), `location` (Reference), `content`, `timestamp`.
-
+- **Comment Schema**: `user` (Reference), `location` (Reference), `content`, `timestamp`
 ***
 
 ### 階段二：後端 API 開發 (Backend Development)
