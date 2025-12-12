@@ -5,18 +5,22 @@
 
 #### 1. 環境配置
 - **版本鎖定**：確保本地開發環境符合 `Node v24.9.0` 和 `MongoDB 8.0.13`。
-(Node: https://nodejs.org/dist/v24.9.0/)
-(MongoDB: https://www.mongodb.com/try/download/community)
-（檢查安裝版本是否正確： node check_env.js）
+  - Node: https://nodejs.org/dist/v24.9.0/
+  - MongoDB: https://www.mongodb.com/try/download/community
+  - 檢查安裝版本是否正確： `node check_env.js`
 - **專案結構初始化**：
   建立根目錄 `project-root/`：
   - `/backend` (後端 Node.js)
   - `/frontend` (前端 SPA，如 React/Vue)
   - `package.json` (根目錄配置，或分開配置)
-（完成配置一鍵安裝： npm run install-all）
+- **完成配置一鍵安裝**： `npm run install-all`）
 
 #### 2. 數據獲取與預處理 (Data Pre-processing)
 - **數據源**：從 XML 數據集（如香港文化活動）中提取數據。
+  - Programme information： https://www.lcsd.gov.hk/datagovhk/event/events.xml
+  - Venues of programmes： https://www.lcsd.gov.hk/datagovhk/event/venues.xml
+  - Closed dates of venues： https://www.lcsd.gov.hk/datagovhk/event/holiday.xml
+  - Dates of programmes：https://www.lcsd.gov.hk/datagovhk/event/eventDates.xml
 - **腳本編寫**：
   - 創建一個一次性的 `importData.js` 腳本。
   - **XML 解析**：使用 `xml2js` 或類似庫解析 XML。
@@ -25,17 +29,15 @@
   - **地理編碼**：為這 10 個場地手動或自動查找經緯度（Latitude/Longitude），這是地圖功能的核心。
   - **測試**
     1. 確保 MongoDB 已啟動
-      （  啟動MongoDB： brew services start mongodb-community@8.0
-          停止MongoDB： brew services stop mongodb-community@8.0）
-    2. 在 backend 目錄下執行  npm install axios xml2js mongoose dotenv 
-    3. 執行  node utils/importData.js 
+        - 啟動MongoDB： `brew services start mongodb-community@8.0`
+        - 停止MongoDB： `brew services stop mongodb-community@8.0`
+    2. 在 backend 目錄下執行  `npm install axios xml2js mongoose dotenv `
+    3. 執行  `node utils/importData.js `
     4. 如果成功，終端機會顯示  🎉 Successfully imported ... events
-  （Programme information： https://www.lcsd.gov.hk/datagovhk/event/events.xml
-  Venues of programmes： https://www.lcsd.gov.hk/datagovhk/event/venues.xml
-  Closed dates of venues： https://www.lcsd.gov.hk/datagovhk/event/holiday.xml
-  Dates of programmes：https://www.lcsd.gov.hk/datagovhk/event/eventDates.xml）
-  （測試： brew services start mongodb-community@8.0  ->   node utils/importData.js）
-   (MongoDB Compass:  mongodb://127.0.0.1:27017 -Location -Event)
+    5. MongoDB Compass 查看 `mongodb://127.0.0.1:27017` 
+        - `Location` 
+        - `Event`
+ 
 
 #### 3. 數據庫設計 (MongoDB Schema)
 在 `/backend/models` 中定義 Mongoose Schemas：
@@ -43,9 +45,37 @@
 - **Location Schema**: `name`, `coords` {lat, lng}, `events` (Reference or Embedded).
 - **Event Schema**: `title`, `description`, `date`, `venue` (Reference to Location), `presenter`.
 - **Comment Schema**: `user` (Reference), `location` (Reference), `content`, `timestamp`
-***
+- **安裝依賴**: 加密密碼 `npm install bcryptjs`
+- **測試**: 運行`createAdmin_test.js`&`seedComments_test.js`並檢查MongDB是否有新的數據結構
 
-### 階段二：後端 API 開發 (Backend Development)
+***
+### 當前進度目錄
+  ```
+    .
+    ├── backend
+    │   ├── models
+    │   │   ├── Comment.js
+    │   │   ├── Event.js
+    │   │   ├── Location.js
+    │   │   ├── User.js
+    │   │   └── compare.js
+    │   ├── package-lock.json
+    │   ├── package.json
+    │   └── utils
+    │       ├── createAdmin_test.js
+    │       ├── importData.js
+    │       └── seedComments_test.js
+    ├── check_env.js
+    ├── frontend
+    ├── package-lock.json
+    ├── package.json
+    └── readme.md
+  ```
+***
+***
+(Chen Xu lin負責)
+### 階段二：後端 API 開發 (Backend Development) 
+
 在前端開始之前，先確保後端能提供數據。使用 Express.js 構建 RESTful API。
 
 #### 1. 認證模組 (Authentication)
@@ -68,7 +98,8 @@
 - `POST/PUT/DELETE /api/admin/users`: 管理用戶數據。
 
 ***
-
+***
+(Andy Tang負責)
 ### 階段三：前端 SPA 架構與組件 (Frontend Architecture)
 建議使用 React 或 Vue 構建單頁應用 (SPA)，使用 React Router 或 Vue Router 處理路由。
 
@@ -99,7 +130,6 @@
   - `DataCache`: 考慮緩存位置數據，避免每次切換視圖都請求後端（這也是 SPA 的優勢）。
 
 ***
-
 ### 階段四：功能整合與地圖實現 (Integration)
 
 #### 1. 地圖交互
