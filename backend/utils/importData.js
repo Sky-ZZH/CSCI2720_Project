@@ -208,7 +208,7 @@ const importData = async () => {
   try {
     // A. 連接數據庫
     await mongoose.connect(
-      process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/csci2720_project'
+      process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/project_db'
     );
     console.log('✅ 已連接到 MongoDB');
 

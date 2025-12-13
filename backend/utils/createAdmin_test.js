@@ -12,7 +12,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const createAdmin = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/project_db');
     console.log('✅ Connected to MongoDB');
 
     // 檢查管理員是否已存在
