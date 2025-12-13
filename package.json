@@ -8,7 +8,7 @@
     "install-all": "npm install && cd backend && npm install",
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd backend && npm start",
-    "client": "echo 'Frontend not ready yet'",
+    "client": "npx serve frontend",
     "dev": "concurrently \"npm run server-dev\" \"npm run client\"",
     "server-dev": "cd backend && npm run dev"
   },
