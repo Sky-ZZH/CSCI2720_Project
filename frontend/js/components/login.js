@@ -6,24 +6,24 @@ export function renderLogin() {
     const app = document.getElementById('app');
     app.innerHTML = `
         <div class="login-container">
-            <h1>🎭 HK Cultural Events</h1>
-            <p>Sign in to explore cultural venues</p>
-            <div id="loginError" class="text-error" style="display:none; margin-bottom:1rem;"></div>
+            <h1>Sign In</h1>
+            <div id="loginError" class="login-error"></div>
             <form id="loginForm">
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" id="username" placeholder="testuser" required>
+                    <input type="text" id="username" required placeholder="Enter username">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="password" placeholder="password123" required>
+                    <input type="password" id="password" required placeholder="Enter password">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width:100%">Login</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
             </form>
-            <p style="margin-top:2rem; font-size:0.9rem; opacity:0.7">
-                User: testuser / password123<br>
-                Admin: admin / admin123
-            </p>
+            <div style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+                <p>Demo Users:</p>
+                <p>User: <strong>testuser</strong> / <strong>password123</strong></p>
+                <p>Admin: <strong>admin</strong> / <strong>admin123</strong></p>
+            </div>
         </div>
     `;
 
@@ -34,18 +34,42 @@ export function renderLogin() {
         const errorDiv = document.getElementById('loginError');
 
         try {
+            errorDiv.style.display = 'none';
+            
+            // 1. Call Login API
             const data = await login(username, password);
-            localStorage.setItem('token', data.token);
+            
+            // 2. Decode Token to get User Info
+            let payload = {};
+            try {
+                const base64Url = data.token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                payload = JSON.parse(jsonPayload);
+            } catch (err) {
+                console.warn("Login token decode warning:", err);
+                // Fallback: If decode fails, use input username just to let user in
+                payload = { 
+                    username: username, 
+                    role: username === 'admin' ? 'admin' : 'user' 
+                };
+            }
+
+            // 3. Update State
             updateState({
                 token: data.token,
-                currentUser: data.username,
-                role: data.role
+                currentUser: payload.username || payload.sub || username,
+                role: payload.role || 'user'
             });
+
+            // 4. Redirect (triggers handleRouting -> updateNavBar)
             window.location.hash = '#/locations';
-            // Force reload to update nav state properly
-            window.location.reload();
+            
         } catch (error) {
-            errorDiv.textContent = error.message;
+            console.error(error);
+            errorDiv.textContent = error.message || 'Login failed';
             errorDiv.style.display = 'block';
         }
     });
