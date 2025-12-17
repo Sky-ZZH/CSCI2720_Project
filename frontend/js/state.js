@@ -1,0 +1,15 @@
+export const API_BASE_URL = 'http://localhost:5000/api';
+
+export const state = {
+    token: localStorage.getItem('token'),
+    currentUser: null,
+    role: null,
+    locations: [],
+    favourites: [],
+    currentLocationId: null,
+    isDarkMode: localStorage.getItem('darkMode') === 'true'
+};
+
+export function updateState(newState) {
+    Object.assign(state, newState);
+}

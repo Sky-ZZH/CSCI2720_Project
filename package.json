@@ -2,13 +2,13 @@
   "name": "CSCI2720_Project",
   "version": "1.0.0",
   "description": "Node.js + MongoDB + SPA",
-  "main": "check_env.js", 
+  "main": "check_env.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install-all": "npm install && cd backend && npm install",
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd backend && npm start",
-    "client": "echo 'Frontend not ready yet'",
+    "client": "npx serve frontend",
     "dev": "concurrently \"npm run server-dev\" \"npm run client\"",
     "server-dev": "cd backend && npm run dev"
   },
@@ -19,8 +19,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs", 
+  "type": "commonjs",
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.3"
   }
 }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HK Cultural Events Finder</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">🎭 HK Cultural Events</div>
+            <div class="nav-menu" id="navMenu">
+                <a href="#/locations" class="nav-link" data-route="locations">Locations</a>
+                <a href="#/map" class="nav-link" data-route="map">Map</a>
+                <a href="#/favourites" class="nav-link" data-route="favourites">Favourites</a>
+                <a href="#/admin" class="nav-link" data-route="admin" id="adminLink" style="display:none;">Admin</a>
+                <button id="themeToggle" class="theme-btn">🌙 Dark Mode</button>
+                <span id="userDisplay" class="user-display"></span>
+                <button id="logoutBtn" class="btn btn-logout" style="display:none;">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main App Container -->
+    <div id="app" class="app-container">
+        <!-- Views will be rendered here -->
+    </div>
+
+    <!-- Modals -->
+    <div id="modalContainer"></div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
