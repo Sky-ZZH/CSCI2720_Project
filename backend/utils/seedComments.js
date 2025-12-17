@@ -17,7 +17,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const seedComments = async () => {
   try {
     // 1. 連接數據庫
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGO_URI);
     console.log('✅ Connected to MongoDB');
 
     // 2. 獲取基礎數據（用戶和場地）

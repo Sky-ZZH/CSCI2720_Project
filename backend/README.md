@@ -201,5 +201,3 @@ npm install jsonwebtoken
     "message": "Event removed"
 }
 ```
-
-

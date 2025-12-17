@@ -46,7 +46,7 @@
 - **Event Schema**: `title`, `description`, `date`, `venue` (Reference to Location), `presenter`.
 - **Comment Schema**: `user` (Reference), `location` (Reference), `content`, `timestamp`
 - **安裝依賴**: 加密密碼 `npm install bcryptjs`
-- **測試**: 運行`createAdmin_test.js`&`seedComments_test.js`並檢查MongDB是否有新的數據結構
+- **測試**: 運行`createAdmin.js`&`seedComments.js`並檢查MongDB是否有新的數據結構
 
 ***
 ### 當前進度目錄
@@ -166,3 +166,11 @@
 - 描述數據預處理邏輯。
 
 這個開發流程將大任務拆解為小的可執行單元，建議您從**數據預處理**和**後端 API**開始，確保數據流動通暢後再構建前端界面。
+
+**How to Start**
+Run Backend:
+* npm run seed:all
+* npm run dev
+Run Frontend:
+simple server
+* 

@@ -107,7 +107,24 @@ router.delete('/users/:id', async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }// DELETE /api/admin/users/:id
+router.delete('/users/:id', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (user) {
+            if (user._id.toString() === req.user._id.toString()) {
+                res.status(400).json({ message: 'You cannot delete your own admin account.' });
+                return; 
+            }
+            await user.deleteOne();
+            res.json({ message: 'User removed' });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
+});
 });
 
 export default router;
