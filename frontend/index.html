@@ -13,14 +13,42 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">🎭 HK Cultural Events</div>
+            
             <div class="nav-menu" id="navMenu">
-                <a href="#/locations" class="nav-link" data-route="locations">Locations</a>
+                <!-- Navigation Links -->
+                <a href="#/home" class="nav-link" data-route="home">Home</a>
+                <a href="#/locations" class="nav-link" data-route="locations">Location List</a>
+                <a href="#/events" class="nav-link" data-route="events">Event List</a>
                 <a href="#/map" class="nav-link" data-route="map">Map</a>
-                <a href="#/favourites" class="nav-link" data-route="favourites">Favourites</a>
+                <a href="#/favourites" class="nav-link" data-route="favourites">Favourite list</a>
+                
+                <!-- Admin Link (hidden by default, accessible via dropdown) -->
                 <a href="#/admin" class="nav-link" data-route="admin" id="adminLink" style="display:none;">Admin</a>
+
+                <!-- Theme Toggle -->
                 <button id="themeToggle" class="theme-btn">🌙 Dark Mode</button>
-                <span id="userDisplay" class="user-display"></span>
-                <button id="logoutBtn" class="btn btn-logout" style="display:none;">Logout</button>
+
+                <!-- User Dropdown Menu -->
+                <div class="user-menu" id="userMenu" style="display:none;">
+                    <button class="user-btn" id="userBtn" type="button" aria-label="User menu">
+                        <span class="user-avatar" id="userAvatar">U</span>
+                    </button>
+
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-meta">
+                            <div class="user-name" id="userName">User</div>
+                            <div class="user-email text-muted" id="userEmail"></div>
+                        </div>
+
+                        <button class="dropdown-item" id="userManagerBtn" type="button">User Manager</button>
+                        <button class="dropdown-item" id="eventManagerBtn" type="button">Event Manager</button>
+                        <button class="dropdown-item" id="profileBtn" type="button">Profile</button>
+
+                        <div class="dropdown-divider"></div>
+
+                        <button class="dropdown-item danger" id="signOutBtn" type="button">Sign out</button>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
