@@ -1,4 +1,4 @@
-import { getUsers, createUser, updateUser, deleteUser } from '../api.js';
+import { getUsers, createUser, updateUser, deleteUser, getEvents, deleteEvent } from '../api.js';
 
 export async function renderAdmin() {
     const app = document.getElementById('app');
@@ -15,20 +15,63 @@ export async function renderAdmin() {
                         <div class="loading"><div class="spinner"></div></div>
                     </div>
                 </div>
-                <!-- Future: Event Management Section -->
                 <div class="admin-section">
-                    <h2>Event Management</h2>
-                    <p class="text-muted">Event management features coming soon.</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <h2>Event Management</h2>
+                    </div>
+                    <div id="eventsList" class="admin-list">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
                 </div>
             </div>
         </div>
     `;
 
     loadUsers();
+    loadEvents();
 
     document.getElementById('addUserBtn').addEventListener('click', () => {
         showUserModal();
     });
+}
+
+async function loadEvents() {
+    try {
+        const events = await getEvents();
+        const list = document.getElementById('eventsList');
+        
+        if (events.length === 0) {
+            list.innerHTML = '<p class="text-muted">No events found.</p>';
+            return;
+        }
+
+        list.innerHTML = events.map(event => `
+            <div class="admin-item">
+                <div class="admin-item-info">
+                    <strong>${event.title}</strong>
+                    <span class="text-muted" style="font-size:0.8em">${event.venue ? event.venue.name : 'Unknown Venue'}</span>
+                </div>
+                <div class="admin-item-actions">
+                    <button class="btn btn-danger btn-small" onclick="removeEvent('${event._id}')">Delete</button>
+                </div>
+            </div>
+        `).join('');
+
+        window.removeEvent = async (id) => {
+            if (confirm('Are you sure you want to delete this event?')) {
+                try {
+                    await deleteEvent(id);
+                    loadEvents();
+                } catch (error) {
+                    alert('Error deleting event: ' + error.message);
+                }
+            }
+        };
+
+    } catch (error) {
+        document.getElementById('eventsList').innerHTML = 
+            `<div class="text-error">Error loading events: ${error.message}</div>`;
+    }
 }
 
 async function loadUsers() {

@@ -706,3 +706,227 @@ textarea {
 		font-size: 1.2rem;
 	}
 }
+
+/* ===================================
+   TABLE & PAGINATION
+   =================================== */
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.search-bar input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    width: 250px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: #e0e0e0; /* Disabled look */
+    color: #666;
+    min-width: 150px;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    background-color: var(--bg-color);
+}
+
+.slider-container label {
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.pagination-buttons {
+    margin-left: auto; /* Push to right */
+    display: flex;
+    gap: 0.5rem;
+}
+
+.pagination-buttons .btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.table-container {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.locations-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 800px;
+}
+
+.locations-table th {
+    background-color: #f5f5f5; /* Light gray header */
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+[data-theme="dark"] .locations-table th {
+    background-color: #333;
+    color: #ddd;
+    border-bottom: 1px solid #444;
+}
+
+.locations-table td {
+    padding: 1.5rem 1rem; /* More vertical padding */
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+[data-theme="dark"] .locations-table td {
+    border-bottom: 1px solid #444;
+}
+
+/* Sortable Header Buttons */
+.sortable-header {
+    cursor: pointer;
+}
+
+.sort-button {
+    display: inline-flex;
+    align-items: center;
+    background-color: #e0e0e0;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #333;
+}
+
+[data-theme="dark"] .sort-button {
+    background-color: #444;
+    color: #eee;
+}
+
+.sort-icon {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+}
+
+/* Location Pill */
+.location-pill {
+    display: inline-block;
+    background-color: #e9ecef;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: #2c3e50; /* Dark blue text */
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.location-pill:hover {
+    background-color: #dee2e6;
+    text-decoration: none;
+}
+
+[data-theme="dark"] .location-pill {
+    background-color: #444;
+    color: #ecf0f1;
+}
+
+[data-theme="dark"] .location-pill:hover {
+    background-color: #555;
+}
+
+/* Favourite Button (Square) */
+.btn-fav-square {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #3498db; /* Blue border */
+    background-color: white;
+    color: #3498db; /* Blue X */
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.btn-fav-square.active {
+    background-color: white;
+    color: #3498db; /* Blue Check */
+    /* Or if you want filled: background-color: #3498db; color: white; */
+}
+
+.btn-fav-square:hover {
+    background-color: #f0f8ff;
+}
+
+[data-theme="dark"] .btn-fav-square {
+    background-color: #2d2d2d;
+    border-color: #3498db;
+}
+
+/* Footer Info */
+.footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.8;
+    background-color: #f9f9f9;
+    border-radius: 0 0 8px 8px; /* Rounded bottom */
+    margin-top: -1rem; /* Connect to table */
+}
+
+[data-theme="dark"] .footer-info {
+    background-color: #252525;
+}
+}
+
+.btn-fav:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.btn-fav-active {
+    border-color: var(--accent-color);
+    background-color: rgba(231, 76, 60, 0.1);
+}

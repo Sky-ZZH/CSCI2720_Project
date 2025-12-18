@@ -10,6 +10,16 @@ router.use(admin);
 
 // --- Events Management ---
 
+// GET /api/admin/events
+router.get('/events', async (req, res) => {
+  try {
+    const events = await Event.find({}).populate('venue', 'name');
+    res.json(events);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // POST /api/admin/events
 router.post('/events', async (req, res) => {
   try {

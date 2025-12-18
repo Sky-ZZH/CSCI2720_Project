@@ -64,6 +64,10 @@ export async function addComment(locationId, content) {
 }
 
 // Admin API calls
+export async function getEvents() {
+    return fetchAPI('/admin/events');
+}
+
 export async function createEvent(eventData) {
     return fetchAPI('/admin/events', {
         method: 'POST',
