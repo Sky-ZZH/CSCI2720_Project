@@ -47,7 +47,7 @@ export async function renderLocations() {
                 
                 <div class="filter-group">
                     <select id="areaSelect" class="area-select">
-                        <option value="">Area</option>
+                        <option value="">All</option>
                         ${AREAS.map(area => `<option value="${area}">${area}</option>`).join('')}
                     </select>
                 </div>

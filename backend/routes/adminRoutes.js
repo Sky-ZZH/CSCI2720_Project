@@ -1,6 +1,7 @@
 import express from 'express';
 import Event from '../models/Event.js';
 import User from '../models/User.js';
+import Location from '../models/Location.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -15,6 +16,19 @@ router.post('/events', async (req, res) => {
   try {
     const event = new Event(req.body);
     const createdEvent = await event.save();
+
+    // Update the Location to include this new event
+    if (req.body.venue) {
+      const loc = await Location.findByIdAndUpdate(
+        req.body.venue,
+        { $addToSet: { events: createdEvent._id } }, // Use $addToSet to prevent duplicates
+        { new: true }
+      );
+      if (!loc) {
+        console.error(`Location not found for update: ${req.body.venue}`);
+      }
+    }
+
     res.status(201).json(createdEvent);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -26,8 +40,19 @@ router.put('/events/:id', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (event) {
+      const oldVenueId = event.venue;
+      
       Object.assign(event, req.body);
       const updatedEvent = await event.save();
+
+      // If venue changed, update both old and new locations
+      if (req.body.venue && oldVenueId && oldVenueId.toString() !== req.body.venue.toString()) {
+        // Remove from old location
+        await Location.findByIdAndUpdate(oldVenueId, { $pull: { events: event._id } });
+        // Add to new location
+        await Location.findByIdAndUpdate(req.body.venue, { $addToSet: { events: event._id } });
+      }
+
       res.json(updatedEvent);
     } else {
       res.status(404).json({ message: 'Event not found' });
@@ -43,6 +68,15 @@ router.delete('/events/:id', async (req, res) => {
     const event = await Event.findById(req.params.id);
     if (event) {
       await event.deleteOne();
+
+      // Remove event reference from Location
+      if (event.venue) {
+        await Location.findByIdAndUpdate(
+          event.venue,
+          { $pull: { events: event._id } }
+        );
+      }
+
       res.json({ message: 'Event removed' });
     } else {
       res.status(404).json({ message: 'Event not found' });

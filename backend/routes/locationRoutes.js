@@ -1,6 +1,7 @@
 import express from 'express';
 import Location from '../models/Location.js';
 import Comment from '../models/Comment.js';
+import Event from '../models/Event.js'; // Import Event to ensure schema is registered for populate
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -27,7 +28,15 @@ router.get('/', async (req, res) => {
 // GET /api/locations/:id
 router.get('/:id', async (req, res) => {
   try {
-    const location = await Location.findOne({ id: req.params.id }).populate('events');
+    let location;
+    
+    // Try finding by custom 'id' string first
+    location = await Location.findOne({ id: req.params.id }).populate('events');
+    
+    // If not found, and the param looks like a Mongo ObjectId, try finding by _id
+    if (!location && req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      location = await Location.findById(req.params.id).populate('events');
+    }
 
     if (location) {
       const comments = await Comment.find({ location: location._id }).populate('user', 'username');

@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (userManagerBtn) userManagerBtn.addEventListener('click', () => { window.location.hash = '#/admin'; });
 
     const eventManagerBtn = document.getElementById('eventManagerBtn');
-    if (eventManagerBtn) eventManagerBtn.addEventListener('click', () => { window.location.hash = '#/admin'; });
+    if (eventManagerBtn) eventManagerBtn.addEventListener('click', () => { window.location.hash = '#/events'; });
 
     // Wire up Profile Button
     const profileBtn = document.getElementById('profileBtn');

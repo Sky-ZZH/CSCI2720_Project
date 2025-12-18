@@ -7,6 +7,39 @@ import {
 } from '../api.js';
 import { state } from '../state.js';
 
+const REGION_MAPPING = {
+    "New Territories": [
+        "Sha Tin", "Tsuen Wan", "Kwai Tsing", "Tuen Mun", "Yuen Long", "North", "Tai Po", "Sai Kung", "Islands",
+        "Kwai Chung", "Tsing Yi", "Tin Shui Wai", "Tai Wai", "Fo Tan", "Ma On Shan", "Fanling", "Sheung Shui", 
+        "Tseung Kwan O", "Lantau", "Tung Chung", "Discovery Bay", "Ma Wan", "Cheung Chau", "Lamma", "Peng Chau"
+    ],
+    "Hong Kong Island": [
+        "Central", "Wan Chai", "Eastern", "Southern", "Western", "Causeway Bay", "Admiralty", "Sheung Wan", 
+        "Sai Ying Pun", "Kennedy Town", "Happy Valley", "Tin Hau", "Fortress Hill", "North Point", "Quarry Bay", 
+        "Tai Koo", "Sai Wan Ho", "Shau Kei Wan", "Chai Wan", "Siu Sai Wan", "Pok Fu Lam", "Aberdeen", "Ap Lei Chau", 
+        "Wong Chuk Hang", "Repulse Bay", "Stanley", "The Peak", "City Hall", "Arts Centre", "Academy for Performing Arts", 
+        "Convention and Exhibition Centre", "Queen Elizabeth Stadium", "Sunbeam Theatre", "Lee Theatre", "Western Market", 
+        "PMQ", "Tai Kwun", "Fringe Club", "Film Archive", "Central Library", "Hong Kong Stadium"
+    ],
+    "Kowloon": [
+        "Tsim Sha Tsui", "Kowloon", "Yau Tsim Mong", "Sham Shui Po", "Wong Tai Sin", "Kwun Tong", "Mong Kok", 
+        "Yau Ma Tei", "Jordan", "Hung Hom", "Ho Man Tin", "To Kwa Wan", "Kai Tak", "Kowloon City", "San Po Kong", 
+        "Diamond Hill", "Choi Hung", "Ngau Chi Wan", "Lok Fu", "Shek Kip Mei", "Lai Chi Kok", "Cheung Sha Wan", 
+        "Mei Foo", "Tai Kok Tsui", "West Kowloon", "Cultural Centre", "Space Museum", "Science Museum", 
+        "Museum of History", "Coliseum", "Xiqu Centre", "M+", "Palace Museum", "Ko Shan", "MacPherson", "Museum of Art"
+    ]
+};
+
+function getArea(locationName) {
+    if (!locationName) return 'Unknown';
+    for (const [area, keywords] of Object.entries(REGION_MAPPING)) {
+        if (keywords.some(k => locationName.toLowerCase().includes(k.toLowerCase()))) {
+            return area;
+        }
+    }
+    return 'Other';
+}
+
 export async function renderEvents() {
   const isAdmin = (state.role || '').toLowerCase() === 'admin';
 
@@ -24,23 +57,23 @@ export async function renderEvents() {
         </div>
       </div>
 
-      <div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #e0e0e0; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+      <div style="background:var(--card-bg); border-radius:8px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow);">
         <div style="overflow-x:auto;">
           <table style="width:100%; border-collapse:collapse; min-width: 980px;">
             <thead>
-              <tr style="background:#f8f9fa; border-bottom:2px solid #dee2e6;">
-                <th style="padding:1rem; text-align:left; color:#6c757d; font-weight:600; font-size:0.85rem; text-transform:uppercase;">Event Title</th>
-                <th style="padding:1rem; text-align:left; color:#6c757d; font-weight:600; font-size:0.85rem; text-transform:uppercase;">Description</th>
-                <th style="padding:1rem; text-align:left; color:#6c757d; font-weight:600; font-size:0.85rem; text-transform:uppercase;">Venue</th>
-                <th style="padding:1rem; text-align:left; color:#6c757d; font-weight:600; font-size:0.85rem; text-transform:uppercase;">Price</th>
-                <th style="padding:1rem; text-align:left; color:#6c757d; font-weight:600; font-size:0.85rem; text-transform:uppercase;">Presenter(s)</th>
-                <th style="padding:1rem; text-align:left; color:#6c757d; font-weight:600; font-size:0.85rem; text-transform:uppercase;">Date & Time</th>
-                ${isAdmin ? `<th style="padding:1rem; text-align:center; color:#6c757d; font-weight:600; font-size:0.85rem; text-transform:uppercase;">Actions</th>` : ''}
+              <tr style="background:var(--bg-color); border-bottom:2px solid var(--border-color);">
+                <th style="padding:1rem; text-align:left; color:var(--text-color); font-weight:600; font-size:0.85rem; text-transform:uppercase;">Event Title</th>
+                <th style="padding:1rem; text-align:left; color:var(--text-color); font-weight:600; font-size:0.85rem; text-transform:uppercase;">Description</th>
+                <th style="padding:1rem; text-align:left; color:var(--text-color); font-weight:600; font-size:0.85rem; text-transform:uppercase;">Venue</th>
+                <th style="padding:1rem; text-align:left; color:var(--text-color); font-weight:600; font-size:0.85rem; text-transform:uppercase;">Price</th>
+                <th style="padding:1rem; text-align:left; color:var(--text-color); font-weight:600; font-size:0.85rem; text-transform:uppercase;">Presenter(s)</th>
+                <th style="padding:1rem; text-align:left; color:var(--text-color); font-weight:600; font-size:0.85rem; text-transform:uppercase;">Date & Time</th>
+                ${isAdmin ? `<th style="padding:1rem; text-align:center; color:var(--text-color); font-weight:600; font-size:0.85rem; text-transform:uppercase;">Actions</th>` : ''}
               </tr>
             </thead>
             <tbody id="eventsTbody">
               <tr>
-                <td colspan="${isAdmin ? 7 : 6}" style="text-align:center; padding:2rem; color:#999;">Loading events...</td>
+                <td colspan="${isAdmin ? 7 : 6}" style="text-align:center; padding:2rem; color:var(--text-color); opacity:0.6;">Loading events...</td>
               </tr>
             </tbody>
           </table>
@@ -57,41 +90,41 @@ export async function renderEvents() {
     ${isAdmin ? `
     <!-- Admin Modal -->
     <div id="eventModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; overflow:auto;">
-      <div style="background:#fff; max-width:680px; margin:48px auto; border-radius:10px; padding:1.5rem; position:relative;">
-        <button id="closeModal" style="position:absolute; top:12px; right:12px; background:none; border:none; font-size:1.6rem; cursor:pointer; color:#999;">&times;</button>
-        <h2 id="modalTitle" style="margin:0 0 1rem 0;">Edit Event</h2>
+      <div style="background:var(--card-bg); max-width:680px; margin:48px auto; border-radius:10px; padding:1.5rem; position:relative; border: 1px solid var(--border-color);">
+        <button id="closeModal" style="position:absolute; top:12px; right:12px; background:none; border:none; font-size:1.6rem; cursor:pointer; color:var(--text-color); opacity: 0.7;">&times;</button>
+        <h2 id="modalTitle" style="margin:0 0 1rem 0; color:var(--text-color);">Edit Event</h2>
 
         <form id="eventForm" style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <input type="hidden" id="eventId">
 
           <div style="grid-column:1 / -1;">
-            <label style="display:block; font-weight:600; margin-bottom:6px;">Title *</label>
-            <input id="fTitle" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;">
+            <label style="display:block; font-weight:600; margin-bottom:6px; color:var(--text-color);">Title *</label>
+            <input id="fTitle" required style="width:100%; padding:10px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-color); color:var(--text-color);">
           </div>
 
           <div style="grid-column:1 / -1;">
-            <label style="display:block; font-weight:600; margin-bottom:6px;">Description</label>
-            <textarea id="fDesc" rows="3" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;"></textarea>
+            <label style="display:block; font-weight:600; margin-bottom:6px; color:var(--text-color);">Description</label>
+            <textarea id="fDesc" rows="3" style="width:100%; padding:10px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-color); color:var(--text-color);"></textarea>
           </div>
 
           <div style="grid-column:1 / -1;">
-            <label style="display:block; font-weight:600; margin-bottom:6px;">Venue *</label>
-            <select id="fVenue" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;"></select>
+            <label style="display:block; font-weight:600; margin-bottom:6px; color:var(--text-color);">Venue *</label>
+            <select id="fVenue" required style="width:100%; padding:10px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-color); color:var(--text-color);"></select>
           </div>
 
           <div>
-            <label style="display:block; font-weight:600; margin-bottom:6px;">Price</label>
-            <input id="fPrice" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;" placeholder="e.g. Free, $100">
+            <label style="display:block; font-weight:600; margin-bottom:6px; color:var(--text-color);">Price</label>
+            <input id="fPrice" style="width:100%; padding:10px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-color); color:var(--text-color);" placeholder="e.g. Free, $100">
           </div>
 
           <div>
-            <label style="display:block; font-weight:600; margin-bottom:6px;">Presenter</label>
-            <input id="fPresenter" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;">
+            <label style="display:block; font-weight:600; margin-bottom:6px; color:var(--text-color);">Presenter</label>
+            <input id="fPresenter" style="width:100%; padding:10px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-color); color:var(--text-color);">
           </div>
 
           <div style="grid-column:1 / -1;">
-            <label style="display:block; font-weight:600; margin-bottom:6px;">Date & Time</label>
-            <input id="fDateTime" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;">
+            <label style="display:block; font-weight:600; margin-bottom:6px; color:var(--text-color);">Date & Time</label>
+            <input id="fDateTime" style="width:100%; padding:10px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-color); color:var(--text-color);">
           </div>
 
           <div style="grid-column:1 / -1; display:flex; justify-content:flex-end; gap:10px; margin-top:6px;">
@@ -141,16 +174,16 @@ export async function renderEvents() {
     if (pageItems.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="${isAdmin ? 7 : 6}" style="text-align:center; padding:2rem; color:#999;">No events found.</td>
+          <td colspan="${isAdmin ? 7 : 6}" style="text-align:center; padding:2rem; color:var(--text-color); opacity:0.6;">No events found.</td>
         </tr>
       `;
     } else {
       tbody.innerHTML = pageItems.map(evt => `
-        <tr style="border-bottom:1px solid #e9ecef;">
+        <tr style="border-bottom:1px solid var(--border-color);">
           <td style="padding:1rem; vertical-align:top; width:260px;">
-            <div style="font-weight:500; color:#333; line-height:1.4;">${safeText(evt.title, 'Untitled Event')}</div>
+            <div style="font-weight:500; color:var(--text-color); line-height:1.4;">${safeText(evt.title, 'Untitled Event')}</div>
           </td>
-          <td style="padding:1rem; vertical-align:top; color:#666; font-size:0.9rem; width:240px;">
+          <td style="padding:1rem; vertical-align:top; color:var(--text-color); opacity:0.8; font-size:0.9rem; width:240px;">
             ${evt.description && evt.description !== 'No description available.'
               ? truncate(evt.description, 60)
               : '<span style="opacity:0.55;">N/A</span>'}
@@ -160,19 +193,19 @@ export async function renderEvents() {
               ${safeText(evt.venueName)}
             </a>
           </td>
-          <td style="padding:1rem; vertical-align:top; color:#666; font-size:0.9rem; width:120px;">${safeText(evt.price, 'Free')}</td>
+          <td style="padding:1rem; vertical-align:top; color:var(--text-color); opacity:0.8; font-size:0.9rem; width:120px;">${safeText(evt.price, 'Free')}</td>
           <td style="padding:1rem; vertical-align:top; width:240px;">
-            <div style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:4px; font-size:0.85rem; display:inline-block;">
+            <div style="background:var(--bg-color); color:var(--text-color); border: 1px solid var(--border-color); padding:4px 8px; border-radius:4px; font-size:0.85rem; display:inline-block;">
               ${safeText(evt.presenter, 'N/A')}
             </div>
           </td>
-          <td style="padding:1rem; vertical-align:top; color:#666; font-size:0.9rem; width:220px;">${safeText(evt.dateTime, 'TBA')}</td>
+          <td style="padding:1rem; vertical-align:top; color:var(--text-color); opacity:0.8; font-size:0.9rem; width:220px;">${safeText(evt.dateTime, 'TBA')}</td>
           ${isAdmin ? `
-          <td style="padding:1rem; vertical-align:top; text-align:center; width:140px;">
+          <td style="padding:1rem; vertical-align:top; text-align:center; width:180px;">
             <button class="btn btn-small js-edit" data-id="${evt._id}"
-              style="color:#0d6efd; background:none; border:none; cursor:pointer; text-decoration:underline;">Update</button>
+              style="color:#0d6efd; background:#e3f2fd; border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-weight:500; font-size:0.85rem;">Update</button>
             <button class="btn btn-small js-del" data-id="${evt._id}"
-              style="color:#dc3545; background:none; border:none; cursor:pointer; text-decoration:underline; margin-left:8px;">Delete</button>
+              style="color:#c62828; background:#ffebee; border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-weight:500; margin-left:8px; font-size:0.85rem;">Delete</button>
           </td>` : ''}
         </tr>
       `).join('');
@@ -274,7 +307,8 @@ export async function renderEvents() {
         // 注意：Event.venue 係 ObjectId（Mongo _id），所以 value 用 _id 最穩
         const value = l._id || '';
         const name = l.name || value;
-        return `<option value="${value}" ${value === selected ? 'selected' : ''}>${name}</option>`;
+        const area = getArea(name);
+        return `<option value="${value}" ${value === selected ? 'selected' : ''}>${name} (${area})</option>`;
       }).join('');
       fVenue.innerHTML = `<option value="" disabled ${selected ? '' : 'selected'}>Select a venue</option>` + opts;
     }
