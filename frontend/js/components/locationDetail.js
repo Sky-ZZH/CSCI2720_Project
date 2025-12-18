@@ -1,4 +1,4 @@
-import { getLocationDetails, addComment } from '../api.js';
+import { getLocationDetails, addComment, deleteComment } from '../api.js';
 import { state } from '../state.js';
 
 export async function renderLocationDetail(id) {
@@ -7,6 +7,7 @@ export async function renderLocationDetail(id) {
 
     try {
         const location = await getLocationDetails(id);
+        const currentUser = state.currentUser;
         
         app.innerHTML = `
             <div class="detail-container">
@@ -44,13 +45,27 @@ export async function renderLocationDetail(id) {
                     </div>
                     <div id="commentsList">
                         ${location.comments && location.comments.length > 0
-                            ? location.comments.map(comment => `
-                                <div class="comment-item">
-                                    <div class="comment-author">${comment.user.username}</div>
+                            ? location.comments.map(comment => {
+                                const isMyComment = currentUser && (
+                                    (comment.user && comment.user.username === currentUser) || 
+                                    state.role === 'admin'
+                                );
+                                return `
+                                <div class="comment-item" style="position: relative;">
+                                    <div class="comment-author">
+                                        ${comment.user.username}
+                                    </div>
+                                    ${isMyComment ? `
+                                        <span class="delete-comment-btn" data-id="${comment._id}" 
+                                              style="position: absolute; top: 10px; right: 0; cursor: pointer; color: #dc3545;" 
+                                              title="Delete Comment">
+                                            &#128465;
+                                        </span>
+                                    ` : ''}
                                     <div class="comment-text">${comment.content}</div>
                                     <div class="comment-time">${new Date(comment.timestamp || comment.createdAt).toLocaleString()}</div>
                                 </div>
-                            `).join('')
+                            `}).join('')
                             : '<p class="text-muted">No comments yet. Be the first!</p>'
                         }
                     </div>
@@ -75,6 +90,19 @@ export async function renderLocationDetail(id) {
             showCommentModal(id);
         });
 
+        // Delete Comment Handlers
+        document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const commentId = e.currentTarget.dataset.id;
+                try {
+                    await deleteComment(commentId);
+                    renderLocationDetail(id); // Reload to update list
+                } catch (err) {
+                    alert(err.message);
+                }
+            });
+        });
+
     } catch (error) {
         app.innerHTML = `<div class="text-error">Error loading location details: ${error.message}</div>`;
     }
@@ -86,9 +114,11 @@ function showCommentModal(locationId) {
             <div class="modal-content">
                 <span class="close" id="closeCommentModal">&times;</span>
                 <h2>Add Comment</h2>
-                <form id="commentForm">
-                    <textarea id="commentText" placeholder="Write your comment..." required></textarea>
-                    <button type="submit" class="btn btn-primary">Post Comment</button>
+                <form id="commentForm" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <textarea id="commentText" placeholder="Write your comment..." required style="width: 100%; min-height: 120px;"></textarea>
+                    <div style="text-align: right;">
+                        <button type="submit" class="btn btn-primary">Post Comment</button>
+                    </div>
                 </form>
             </div>
         </div>

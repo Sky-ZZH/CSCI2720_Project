@@ -4,8 +4,8 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const generateToken = (id, username, role) => {
+  return jwt.sign({ id, username, role }, process.env.JWT_SECRET, {
     expiresIn: '30d',
   });
 };
@@ -22,7 +22,7 @@ router.post('/login', async (req, res) => {
         _id: user._id,
         username: user.username,
         role: user.role,
-        token: generateToken(user._id),
+        token: generateToken(user._id, user.username, user.role),
       });
     } else {
       res.status(401).json({ message: 'Invalid username or password' });

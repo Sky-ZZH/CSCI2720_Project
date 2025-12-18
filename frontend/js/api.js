@@ -58,6 +58,12 @@ export async function addComment(locationId, content) {
     });
 }
 
+export async function deleteComment(commentId) {
+    return fetchAPI(`/locations/comments/${commentId}`, {
+        method: 'DELETE'
+    });
+}
+
 // Admin API calls
 export async function createEvent(eventData) {
     return fetchAPI('/admin/events', {
