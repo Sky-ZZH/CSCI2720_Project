@@ -63,6 +63,12 @@ export async function addComment(locationId, content) {
     });
 }
 
+export async function deleteComment(locationId, commentId) {
+    return fetchAPI(`/locations/${locationId}/comments/${commentId}`, {
+        method: 'DELETE'
+    });
+}
+
 // Admin API calls
 export async function getEvents() {
     return fetchAPI('/admin/events');

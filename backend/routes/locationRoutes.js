@@ -66,4 +66,24 @@ router.post('/:id/comments', protect, async (req, res) => {
   }
 });
 
+// DELETE /api/locations/:id/comments/:commentId
+router.delete('/:id/comments/:commentId', protect, async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // Check if user is owner or admin
+    if (comment.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+       return res.status(401).json({ message: 'Not authorized to delete this comment' });
+    }
+
+    await comment.deleteOne();
+    res.json({ message: 'Comment removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;

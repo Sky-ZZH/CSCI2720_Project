@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const payload = JSON.parse(atob(state.token.split('.')[1]));
             updateState({
                 currentUser: payload.username,
+                userId: payload.id,
                 role: payload.role
             });
             updateNavBar();
