@@ -47,7 +47,9 @@ router.post('/favorites', protect, async (req, res) => {
 router.get('/favorites', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate('favorites');
-    res.json(user.favorites);
+    // Filter out nulls (in case referenced locations were deleted)
+    const validFavorites = user.favorites.filter(fav => fav !== null);
+    res.json(validFavorites);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

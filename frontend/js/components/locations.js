@@ -23,9 +23,13 @@ export async function renderLocations() {
     `;
 
     try {
+        console.log('Fetching locations and favorites...');
         const [locations, favorites] = await Promise.all([
             getLocations(),
-            getFavorites()
+            getFavorites().catch(err => {
+                console.error('Failed to load favorites:', err);
+                return []; // Fallback to empty favorites if request fails
+            })
         ]);
         
         updateState({ locations, favorites });
@@ -62,7 +66,7 @@ function renderLocationsGrid(locations) {
     }
 
     grid.innerHTML = locations.map(loc => {
-        const isFav = state.favorites.some(f => f._id === loc._id || f === loc._id);
+        const isFav = state.favorites.some(f => f && (f._id === loc._id || f === loc._id));
         return `
             <div class="location-card" onclick="window.location.hash='#/location/${loc.id}'">
                 <h3>${loc.name}</h3>

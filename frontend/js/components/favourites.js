@@ -21,7 +21,9 @@ export async function renderFavourites() {
             return;
         }
 
-        grid.innerHTML = favorites.map(loc => `
+        grid.innerHTML = favorites
+            .filter(loc => loc !== null) // Filter out nulls
+            .map(loc => `
             <div class="location-card" onclick="window.location.hash='#/location/${loc.id}'">
                 <h3>${loc.name}</h3>
                 <div class="location-card-footer">
