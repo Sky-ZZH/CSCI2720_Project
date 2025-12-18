@@ -1,12 +1,14 @@
 import { state, updateState } from './state.js';
 import { renderLogin } from './components/login.js';
-import { renderSignup } from './components/signup.js'; // Import signup
+import { renderSignup } from './components/signup.js';
 import { renderLocations } from './components/locations.js';
 import { renderLocationDetail } from './components/locationDetail.js';
 import { renderFavourites } from './components/favourites.js';
 import { renderAdmin } from './components/admin.js';
 import { renderMap } from './components/map.js';
 import { renderProfile } from './components/profile.js';
+import { renderRandomEvent } from './components/randomEvent.js';
+import { renderEvents } from './components/events.js'; // Import the new Events component
 
 // ============================================================
 // INITIALIZATION
@@ -89,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
             logout();
         }
     } else {
-        // If no token, check if we're on the signup page, otherwise redirect to login
         const currentHash = window.location.hash;
         if (currentHash !== '#/signup') {
             renderLogin();
@@ -110,7 +111,7 @@ export function handleRouting() {
     const hash = window.location.hash.slice(1) || '/home'; // Default to home
     const [route, id] = hash.split('/').filter(Boolean);
 
-    // Allow signup without token
+    // Allow signup and login pages without token
     if (!state.token && route !== 'login' && route !== 'signup') {
         renderLogin();
         return;
@@ -125,7 +126,7 @@ export function handleRouting() {
         case 'login':
             renderLogin();
             break;
-        case 'signup': // New signup route
+        case 'signup':
             renderSignup();
             break;
         case 'home':
@@ -135,13 +136,16 @@ export function handleRouting() {
             renderLocations();
             break;
         case 'events':
-            renderEvents();
+            renderEvents(); // Now uses the full Events table component
             break;
         case 'map':
             renderMap();
             break;
         case 'profile':
             renderProfile();
+            break;
+        case 'random':
+            renderRandomEvent();
             break;
         case 'location':
             renderLocationDetail(id);
@@ -158,7 +162,7 @@ export function handleRouting() {
             }
             break;
         default:
-            renderLocations();
+            renderHome(); // Default to home page for any unknown routes
     }
 }
 
@@ -198,36 +202,61 @@ function toggleTheme() {
 
 function logout() {
     localStorage.removeItem('token');
-    localStorage.removeItem('userLocation'); // Optional: Clear location on logout
+    localStorage.removeItem('userLocation');
     updateState({
         token: null,
         currentUser: null,
         role: null,
-        userLocation: null // Reset state
+        userLocation: null
     });
     window.location.hash = '#/login';
     window.location.reload();
 }
 
-// Placeholder functions
+// ============================================================
+// PLACEHOLDER PAGES
+// ============================================================
+
 function renderHome() {
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div class="container text-center">
-            <h1>Welcome to HK Cultural Events Finder</h1>
-            <p>Discover art, music, and cultural events near you.</p>
-            <br>
-            <a href="#/locations" class="btn btn-primary">Browse Locations</a>
-        </div>
-    `;
-}
+        <div class="container text-center" style="padding-top: 3rem;">
+            <h1 style="font-size: 3rem; margin-bottom: 1rem;">Welcome to HK Cultural Events Finder</h1>
+            <p style="font-size: 1.2rem; color: var(--text-color); opacity: 0.8;">Discover art, music, and cultural events near you.</p>
+            
+            <div style="margin: 3rem 0; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="#/locations" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                    Browse All Locations
+                </a>
+                <a href="#/random" class="btn btn-secondary" style="
+                    padding: 1rem 2rem; 
+                    font-size: 1.1rem;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                ">
+                    🍀 I'm Feeling Lucky
+                </a>
+            </div>
 
-function renderEvents() {
-    const app = document.getElementById('app');
-    app.innerHTML = `
-        <div class="container">
-            <h1>Events</h1>
-            <p class="text-muted">Event list coming soon...</p>
+            <div style="margin-top: 4rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+                <div style="padding: 1.5rem; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📍</div>
+                    <h3>Location-Based</h3>
+                    <p class="text-muted">Find events near you</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎭</div>
+                    <h3>Diverse Events</h3>
+                    <p class="text-muted">Art, music, culture & more</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">❤️</div>
+                    <h3>Save Favorites</h3>
+                    <p class="text-muted">Never miss your events</p>
+                </div>
+            </div>
         </div>
     `;
 }

@@ -1,5 +1,5 @@
 import { login } from '../api.js';
-import { state, updateState } from '../state.js';
+import { updateState } from '../state.js';
 import { handleRouting } from '../app.js';
 
 export function renderLogin() {
@@ -29,44 +29,57 @@ export function renderLogin() {
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const username = document.getElementById('username').value;
+
+        const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
         const errorDiv = document.getElementById('loginError');
 
         try {
             errorDiv.style.display = 'none';
-            
-            // 1. Call Login API
-            const data = await login(username, password);
-            
-            // 2. Decode Token to get User Info
+            errorDiv.textContent = '';
+
+            // 1) Call Login API
+            const data = await login(username, password); // returns token (and usually role/username) [file:248]
+
+            // 2) Decode Token to get User Info
             let payload = {};
             try {
                 const base64Url = data.token.split('.')[1];
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
+                const jsonPayload = decodeURIComponent(
+                    atob(base64)
+                        .split('')
+                        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                        .join('')
+                );
                 payload = JSON.parse(jsonPayload);
             } catch (err) {
                 console.warn("Login token decode warning:", err);
-                // Fallback: If decode fails, use input username just to let user in
-                payload = { 
-                    username: username, 
-                    role: username === 'admin' ? 'admin' : 'user' 
+                payload = {
+                    username,
+                    role: username.toLowerCase() === 'admin' ? 'admin' : 'user'
                 };
             }
 
-            // 3. Update State
+            const finalUsername = payload.username || payload.sub || username;
+            const finalRole = payload.role || data.role || 'user';
+
+            // 3) Save to localStorage (so refresh still has admin role)
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('username', finalUsername);
+            localStorage.setItem('role', finalRole);
+
+            // 4) Update State
             updateState({
                 token: data.token,
-                currentUser: payload.username || payload.sub || username,
-                role: payload.role || 'user'
+                currentUser: finalUsername,
+                role: finalRole
             });
 
-            // 4. Redirect (triggers handleRouting -> updateNavBar)
-            window.location.hash = '#/locations';
-            
+            // 5) Redirect to Home
+            window.location.hash = '#/home';
+            handleRouting();
+
         } catch (error) {
             console.error(error);
             errorDiv.textContent = error.message || 'Login failed';

@@ -63,7 +63,7 @@ export async function renderLocationDetail(id) {
                                         </span>
                                     ` : ''}
                                     <div class="comment-text">${comment.content}</div>
-                                    <div class="comment-time">${new Date(comment.timestamp || comment.createdAt).toLocaleString()}</div>
+                                    <div class="comment-time">${new Date(comment.createdAt).toLocaleString()}</div>
                                 </div>
                             `}).join('')
                             : '<p class="text-muted">No comments yet. Be the first!</p>'
