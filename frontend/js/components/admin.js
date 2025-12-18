@@ -71,9 +71,7 @@ export async function renderAdmin() {
     if(el) el.textContent = new Date().toLocaleString();
   };
 
-  // ============================================================
-  // USER MANAGEMENT LOGIC
-  // ============================================================
+  // User management 
   let allUsers = [];
   let filteredUsers = [];
   let userPage = 1;
@@ -174,11 +172,7 @@ export async function renderAdmin() {
   // Initialize Users
   initUserParams();
 
-
-  // ============================================================
-  // MODALS
-  // ============================================================
-
+  // Modal
   function showUserModal(user = null) {
     const isEdit = !!user;
     const userId = user ? (user._id || user.id) : null;

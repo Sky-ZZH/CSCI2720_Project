@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
   }]
 });
 
-// 保存前自動加密密碼
+// save password hash before saving
 UserSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
@@ -36,7 +36,7 @@ UserSchema.pre('save', async function(next) {
   }
 });
 
-// 驗證密碼的方法
+// the method to compare password
 UserSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

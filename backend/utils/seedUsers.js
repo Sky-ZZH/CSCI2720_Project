@@ -11,7 +11,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const seedUsers = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/project_db');
-    console.log('✅ Connected to MongoDB');
+    console.log('Connected to MongoDB');
 
     const users = [
       {
@@ -33,18 +33,18 @@ const seedUsers = async () => {
         exists.password = u.password;
         exists.role = u.role;
         await exists.save();
-        console.log(`✅ User ${u.username} updated.`);
+        console.log(`User ${u.username} updated.`);
       } else {
         await User.create(u);
-        console.log(`✅ User ${u.username} created.`);
+        console.log(`User ${u.username} created.`);
       }
     }
 
-    console.log('🎉 Seeding complete!');
+    console.log('Seeding complete!');
     process.exit();
 
   } catch (error) {
-    console.error('❌ Error seeding users:', error);
+    console.error('Error seeding users:', error);
     process.exit(1);
   }
 };

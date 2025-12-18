@@ -182,7 +182,7 @@ function updateNavBar() {
         if (userMenu) {
             userMenu.style.display = 'inline-flex';
             if (userName) userName.textContent = state.currentUser;
-            if (userEmail) userEmail.textContent = state.role === 'admin' ? 'admin@example.com' : 'user@example.com'; 
+            if (userEmail) userEmail.textContent = state.display = "none"; 
             if (userAvatar) userAvatar.textContent = (state.currentUser[0] || 'U').toUpperCase();
 
             const isAdmin = state.role === 'admin';

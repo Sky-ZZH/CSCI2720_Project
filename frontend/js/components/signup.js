@@ -1,4 +1,3 @@
-// js/components/signup.js
 import { state, updateState, DEFAULT_LOCATION } from '../state.js';
 import { API_BASE_URL } from '../state.js';
 

@@ -1,6 +1,6 @@
 import { getLocations, toggleFavorite, getFavorites } from '../api.js';
 import { state, updateState } from '../state.js';
-import { calculateDistance } from '../utils/distance.js';
+import { calculateDistance } from './distance.js';
 
 // Predefined areas for the dropdown
 const AREAS = [
