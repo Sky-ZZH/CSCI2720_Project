@@ -1,7 +1,7 @@
 import express from 'express';
 import Location from '../models/Location.js';
 import Comment from '../models/Comment.js';
-import Event from '../models/Event.js'; // Import Event to ensure schema is registered for populate
+import Event from '../models/Event.js'; 
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();

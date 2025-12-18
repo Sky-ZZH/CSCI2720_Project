@@ -1,6 +1,6 @@
 import { state } from '../state.js';
 import { getLocations, getLocationDetails } from '../api.js';
-import { calculateDistance } from '../utils/distance.js';
+import { calculateDistance } from './distance.js';
 
 export async function renderRandomEvent() {
   const app = document.getElementById('app');

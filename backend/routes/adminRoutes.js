@@ -141,7 +141,9 @@ router.delete('/users/:id', async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
-    }// DELETE /api/admin/users/:id
+    }
+
+// DELETE /api/admin/users/:id
 router.delete('/users/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);

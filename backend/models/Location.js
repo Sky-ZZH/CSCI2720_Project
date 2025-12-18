@@ -8,12 +8,12 @@ const LocationSchema = new mongoose.Schema({
   events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }] // 關聯 Event
 });
 
-// 添加虛擬屬性 coords 以方便前端使用 {lat, lng} 格式
+// add virtual property for coordinates
 LocationSchema.virtual('coords').get(function() {
   return { lat: this.latitude, lng: this.longitude };
 });
 
-// 確保虛擬屬性在轉 JSON 時可見
+// make sure virtuals are included when converting to JSON
 LocationSchema.set('toJSON', { virtuals: true });
 LocationSchema.set('toObject', { virtuals: true });
 
