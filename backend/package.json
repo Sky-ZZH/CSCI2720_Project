@@ -9,7 +9,7 @@
     "npm": "11.6.2"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "npm run seed:all && node server.js",
     "dev": "node --watch server.js",
     "import-data": "node utils/importData.js",
     "seed:users": "node utils/seedUsers.js",
