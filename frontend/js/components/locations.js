@@ -1,42 +1,37 @@
 import { getLocations, toggleFavorite, getFavorites } from '../api.js';
 import { state, updateState } from '../state.js';
+import { calculateDistance } from '../utils/distance.js'; // Import the new helper
 
 export async function renderLocations() {
     const app = document.getElementById('app');
 
-    // 1. 改成 Demo 要求的 Filter + Table 佈局
     app.innerHTML = `
         <div class="container">
             <div class="filters-section">
                 <div class="filters-row">
                     <div class="form-group">
-                        <label>Search by location</label>
-                        <input type="text" id="searchInput" placeholder="Search venues...">
+                        <label>Search</label>
+                        <input type="text" id="searchInput" placeholder="Venue name...">
                     </div>
                     
                     <div class="form-group">
-                        <label>Area</label>
-                        <select id="areaSelect">
-                            <option value="">All</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Distance (km)</label>
-                        <input type="number" id="distanceInput" min="0" step="0.1" placeholder="e.g. 10">
+                        <label>Distance Limit (km)</label>
+                        <input type="number" id="distanceInput" min="0" step="1" placeholder="From ${state.userLocation.name}">
                     </div>
                 </div>
 
                 <div class="sort-buttons">
-                    <button class="btn btn-secondary" id="sortName">LOCATION</button>
-                    <button class="btn btn-secondary" id="sortDistance">DISTANCE (KM)</button>
-                    <button class="btn btn-secondary" id="sortEvents">NUMBER OF EVENTS</button>
+                    <button class="btn btn-secondary" id="sortName">Sort Name</button>
+                    <button class="btn btn-secondary" id="sortDistance">Sort Distance</button>
+                    <button class="btn btn-secondary" id="sortEvents">Sort Events</button>
                 </div>
             </div>
 
-            <div class="text-muted" id="lastUpdated" style="margin: 0.5rem 0;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <div class="text-muted" id="lastUpdated"></div>
+                <small class="text-muted">Distances calculated from: <strong>${state.userLocation.name}</strong></small>
+            </div>
 
-            <!-- 2. 改用 Table 顯示 -->
             <div style="overflow-x:auto;">
                 <table class="locations-table" id="locationsTable">
                     <thead>
@@ -44,8 +39,8 @@ export async function renderLocations() {
                             <th>ID</th>
                             <th>LOCATION</th>
                             <th>DISTANCE (KM)</th>
-                            <th>NUMBER OF EVENTS</th>
-                            <th>Add to Favourite</th>
+                            <th>EVENTS</th>
+                            <th>ACTION</th>
                         </tr>
                     </thead>
                     <tbody id="locationsTbody">
@@ -54,18 +49,32 @@ export async function renderLocations() {
                 </table>
             </div>
 
-            <!-- 3. 分頁 (Demo 要求) -->
             <div class="pager">
-                <button class="btn btn-secondary btn-small" id="prevPage">PREVIOUS</button>
+                <button class="btn btn-secondary btn-small" id="prevPage">Prev</button>
                 <div class="text-muted" id="pageInfo">Page 1</div>
-                <button class="btn btn-secondary btn-small" id="nextPage">NEXT</button>
+                <button class="btn btn-secondary btn-small" id="nextPage">Next</button>
             </div>
         </div>
     `;
 
-    // Helpers
-    const getArea = (loc) => (loc.area || loc.district || loc.region || '').toString();
-    const getDistance = (loc) => (loc.distance || loc.distanceKm || null); // 根據後端欄位調整
+    // Calculation Helper
+    // Use fallback lat/long if API doesn't provide (For demo purposes, adding mock coords if missing)
+    const getLocCoords = (loc) => ({
+        lat: loc.latitude || loc.lat || (22.3 + Math.random() * 0.1), // Mock data if missing
+        lng: loc.longitude || loc.lng || (114.1 + Math.random() * 0.1)
+    });
+
+    const getDist = (loc) => {
+        const coords = getLocCoords(loc);
+        const d = calculateDistance(
+            state.userLocation.latitude, 
+            state.userLocation.longitude, 
+            coords.lat, 
+            coords.lng
+        );
+        return d !== null ? d : 9999;
+    };
+    
     const getEventsCount = (loc) => (loc.events ? loc.events.length : (loc.numberOfEvents || 0));
 
     let currentPage = 1;
@@ -76,17 +85,12 @@ export async function renderLocations() {
     try {
         const [locations, favorites] = await Promise.all([getLocations(), getFavorites()]);
         updateState({ locations, favorites });
-
-        // Populate Area Dropdown
-        const areas = [...new Set(locations.map(getArea).filter(a => a))].sort();
-        document.getElementById('areaSelect').innerHTML += areas.map(a => `<option value="${a}">${a}</option>`).join('');
-
+        
         renderTable();
 
-        // Event Listeners
+        // Listeners
         const refresh = () => { currentPage = 1; renderTable(); };
         document.getElementById('searchInput').addEventListener('input', refresh);
-        document.getElementById('areaSelect').addEventListener('change', refresh);
         document.getElementById('distanceInput').addEventListener('input', refresh);
 
         document.getElementById('sortName').addEventListener('click', () => { sortKey = 'name'; sortDir = sortDir==='asc'?'desc':'asc'; refresh(); });
@@ -97,64 +101,56 @@ export async function renderLocations() {
         document.getElementById('nextPage').addEventListener('click', () => { if(currentPage < getTotalPages()) { currentPage++; renderTable(); } });
 
     } catch (error) {
-        document.getElementById('locationsTbody').innerHTML = 
-            `<tr><td colspan="5" class="text-error text-center">Error: ${error.message}</td></tr>`;
+        document.getElementById('locationsTbody').innerHTML = `<tr><td colspan="5" class="text-error">Error: ${error.message}</td></tr>`;
     }
 
-    function getTotalPages() {
-        // 簡單實作：依賴 renderTable 內部算出的 filtered list length
-        // 這裡為了簡單，通常建議把 filter 邏輯抽出來
-        return 1; 
+    function getTotalPages() { return Math.ceil(getFiltered().length / pageSize) || 1; }
+    
+    function getFiltered() {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        const distLimit = document.getElementById('distanceInput').value;
+
+        return state.locations.filter(l => {
+            const matchName = l.name.toLowerCase().includes(term);
+            const d = getDist(l);
+            const matchDist = !distLimit || d <= Number(distLimit);
+            return matchName && matchDist;
+        });
     }
 
     function renderTable() {
-        const term = document.getElementById('searchInput').value.toLowerCase();
-        const area = document.getElementById('areaSelect').value;
-        const dist = document.getElementById('distanceInput').value;
-
-        let filtered = state.locations.filter(l => {
-            const matchName = l.name.toLowerCase().includes(term);
-            const matchArea = !area || getArea(l) === area;
-            // 距離篩選 (如果有距離資料)
-            const d = getDistance(l);
-            const matchDist = !dist || (d !== null && d <= Number(dist));
-            return matchName && matchArea && matchDist;
-        });
+        let filtered = getFiltered();
 
         // Sort
         filtered.sort((a, b) => {
             let valA, valB;
             if (sortKey === 'name') { valA = a.name; valB = b.name; }
-            else if (sortKey === 'distance') { valA = getDistance(a) || 9999; valB = getDistance(b) || 9999; }
+            else if (sortKey === 'distance') { valA = getDist(a); valB = getDist(b); }
             else { valA = getEventsCount(a); valB = getEventsCount(b); }
-            
+
             if (valA < valB) return sortDir === 'asc' ? -1 : 1;
             if (valA > valB) return sortDir === 'asc' ? 1 : -1;
             return 0;
         });
 
         // Pagination
-        const totalPages = Math.ceil(filtered.length / pageSize) || 1;
-        if (currentPage > totalPages) currentPage = totalPages;
-        
         const start = (currentPage - 1) * pageSize;
         const pageItems = filtered.slice(start, start + pageSize);
-
         const tbody = document.getElementById('locationsTbody');
+
         if (pageItems.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No locations found.</td></tr>`;
         } else {
             tbody.innerHTML = pageItems.map(loc => {
-                // 相容 id 和 _id
                 const id = loc.id || loc._id;
                 const isFav = state.favorites.some(f => (f.id || f._id || f) === id);
-                const d = getDistance(loc);
-                
+                const distance = getDist(loc);
+
                 return `
                     <tr class="location-row" onclick="window.location.hash='#/location/${id}'">
                         <td>${id}</td>
                         <td style="color:var(--secondary-color); font-weight:bold;">${loc.name}</td>
-                        <td>${d !== null ? d.toFixed(2) : 'N/A'}</td>
+                        <td>${distance < 9000 ? distance.toFixed(2) : 'N/A'}</td>
                         <td>${getEventsCount(loc)}</td>
                         <td onclick="event.stopPropagation()">
                             <button class="btn btn-small ${isFav ? 'btn-danger' : 'btn-secondary'}" 
@@ -167,19 +163,16 @@ export async function renderLocations() {
             }).join('');
         }
         
-        document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+        document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${getTotalPages()}`;
         document.getElementById('lastUpdated').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
     }
 
-    // Global handler
     window.handleFavorite = async (id) => {
         try {
             await toggleFavorite(id);
             const favorites = await getFavorites();
             updateState({ favorites });
-            renderTable(); // Re-render to update button state
-        } catch (e) {
-            alert(e.message);
-        }
+            renderTable();
+        } catch (e) { alert(e.message); }
     };
 }

@@ -1,10 +1,12 @@
 import { state, updateState } from './state.js';
 import { renderLogin } from './components/login.js';
+import { renderSignup } from './components/signup.js'; // Import signup
 import { renderLocations } from './components/locations.js';
 import { renderLocationDetail } from './components/locationDetail.js';
 import { renderFavourites } from './components/favourites.js';
 import { renderAdmin } from './components/admin.js';
 import { renderMap } from './components/map.js';
+import { renderProfile } from './components/profile.js';
 
 // ============================================================
 // INITIALIZATION
@@ -50,8 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const eventManagerBtn = document.getElementById('eventManagerBtn');
     if (eventManagerBtn) eventManagerBtn.addEventListener('click', () => { window.location.hash = '#/admin'; });
 
+    // Wire up Profile Button
     const profileBtn = document.getElementById('profileBtn');
-    if (profileBtn) profileBtn.addEventListener('click', () => { alert('Profile page not implemented yet'); });
+    if (profileBtn) {
+        profileBtn.addEventListener('click', () => { 
+            window.location.hash = '#/profile'; 
+        });
+    }
 
     // Routing
     window.addEventListener('hashchange', handleRouting);
@@ -59,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check auth on load
     if (state.token) {
         try {
-            // Robust Token Decoding (Handles Base64Url and Unicode)
+            // Robust Token Decoding
             const base64Url = state.token.split('.')[1];
             if (!base64Url) throw new Error("Invalid token format");
 
@@ -71,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const payload = JSON.parse(jsonPayload);
 
             updateState({
-                currentUser: payload.username || payload.sub || 'User', // Fallback for various JWT structures
+                currentUser: payload.username || payload.sub || 'User',
                 role: payload.role || 'user'
             });
             
@@ -82,7 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
             logout();
         }
     } else {
-        renderLogin();
+        // If no token, check if we're on the signup page, otherwise redirect to login
+        const currentHash = window.location.hash;
+        if (currentHash !== '#/signup') {
+            renderLogin();
+        } else {
+            renderSignup();
+        }
     }
 });
 
@@ -94,10 +107,11 @@ export function handleRouting() {
     // Ensure navbar state is correct on every route change
     updateNavBar();
 
-    const hash = window.location.hash.slice(1) || '/locations';
+    const hash = window.location.hash.slice(1) || '/home'; // Default to home
     const [route, id] = hash.split('/').filter(Boolean);
 
-    if (!state.token && route !== 'login') {
+    // Allow signup without token
+    if (!state.token && route !== 'login' && route !== 'signup') {
         renderLogin();
         return;
     }
@@ -111,6 +125,9 @@ export function handleRouting() {
         case 'login':
             renderLogin();
             break;
+        case 'signup': // New signup route
+            renderSignup();
+            break;
         case 'home':
             renderHome();
             break;
@@ -122,6 +139,9 @@ export function handleRouting() {
             break;
         case 'map':
             renderMap();
+            break;
+        case 'profile':
+            renderProfile();
             break;
         case 'location':
             renderLocationDetail(id);
@@ -153,37 +173,20 @@ function updateNavBar() {
     const userAvatar = document.getElementById('userAvatar');
     const userManagerBtn = document.getElementById('userManagerBtn');
     const eventManagerBtn = document.getElementById('eventManagerBtn');
-    
-    // Also support old UI elements if they exist
-    const oldUserDisplay = document.getElementById('userDisplay');
-    const oldLogoutBtn = document.getElementById('logoutBtn');
-    const oldAdminLink = document.getElementById('adminLink');
 
     if (state.currentUser) {
-        // New UI: Show Dropdown
         if (userMenu) {
             userMenu.style.display = 'inline-flex';
             if (userName) userName.textContent = state.currentUser;
             if (userEmail) userEmail.textContent = state.role === 'admin' ? 'admin@example.com' : 'user@example.com'; 
             if (userAvatar) userAvatar.textContent = (state.currentUser[0] || 'U').toUpperCase();
 
-            // Show Admin buttons only if admin
             const isAdmin = state.role === 'admin';
             if (userManagerBtn) userManagerBtn.style.display = isAdmin ? 'block' : 'none';
             if (eventManagerBtn) eventManagerBtn.style.display = isAdmin ? 'block' : 'none';
         }
-
-        // Old UI: Update text (if elements exist)
-        if (oldUserDisplay) oldUserDisplay.textContent = `Hi, ${state.currentUser}`;
-        if (oldLogoutBtn) oldLogoutBtn.style.display = 'inline-block';
-        if (oldAdminLink) oldAdminLink.style.display = (state.role === 'admin') ? 'inline-block' : 'none';
-
     } else {
-        // Not logged in: Hide everything
         if (userMenu) userMenu.style.display = 'none';
-        if (oldUserDisplay) oldUserDisplay.textContent = '';
-        if (oldLogoutBtn) oldLogoutBtn.style.display = 'none';
-        if (oldAdminLink) oldAdminLink.style.display = 'none';
     }
 }
 
@@ -195,10 +198,12 @@ function toggleTheme() {
 
 function logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('userLocation'); // Optional: Clear location on logout
     updateState({
         token: null,
         currentUser: null,
-        role: null
+        role: null,
+        userLocation: null // Reset state
     });
     window.location.hash = '#/login';
     window.location.reload();
